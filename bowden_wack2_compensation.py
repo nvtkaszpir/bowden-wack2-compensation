@@ -180,16 +180,13 @@ class Gcode:
                 if st.value is None:
                     string += f" {st.name}"
                 else:
-                    if st.name in ('X', 'Y', 'Z'):
+                    if st.name in ("X", "Y", "Z"):
                         string += f" {st.name}{Gcode._format_number(st.value, 3)}"
                     elif st.name == "E":
                         string += f" {st.name}{Gcode._format_number(st.value, 5)}"
-                        if self.is_xy_movement() is False:
-                            comment = ""
-                            if self.comment is None:
-                                self.comment = comment
-                            else:
-                                self.comment += f"{comment}"
+                        if (self.is_xy_movement() is False) and self.comment is None:
+                            self.comment = ""
+
                     else:
                         string += f" {st.name}{st.value}"
 
@@ -230,11 +227,8 @@ class Gcode:
             _state = self.previous_state.clone()
 
         # 2025-03-12 Added rudimentary G2/G3 support and G0 for last state support
-        if (
-            self.command == "G1"
-            or self.command == "G2"
-            or self.command == "G3"
-            or (self.command == "G0" and use_for_travel_moves is True)
+        if self.command in ("G1", "G2", "G3") or (
+            self.command == "G0" and use_for_travel_moves is True
         ):
             for parameter in self.parameters:
                 if parameter.name == "X":
@@ -267,7 +261,7 @@ class Gcode:
 
     def is_xy_movement(self):
         # 2025-03-12 Added rudimentary G2/G3 support
-        if self.command != "G1" and self.command != "G2" and self.command != "G3":
+        if self.command not in ("G1", "G2", "G3"):
             return False
         found_x = next(
             (gc for gc in self.parameters if gc.name == "X" and gc.value is not None),
@@ -292,6 +286,7 @@ class Gcode:
         found = next((gc for gc in self.parameters if gc.name == name), None)
         if found is not None:
             return found.value
+        return None
 
 
 def validate_gcode_command_string(string):
@@ -313,9 +308,8 @@ def parse_gcode_line(gcode_line: str, prev_state: State) -> Gcode:
     if not gcode_line:
         return gcode
 
-    if gcode_line.startswith(";") or gcode_line.startswith(
-        "\n"
-    ):  # If contain only comment
+    # If contain only comment
+    if gcode_line.startswith(";") or gcode_line.startswith("\n"):
         if gcode_line.endswith("\n"):
             gcode_line = gcode_line[: len(gcode_line) - 1]
         gcode.command = gcode_line.replace(
@@ -328,21 +322,18 @@ def parse_gcode_line(gcode_line: str, prev_state: State) -> Gcode:
     if len(parts) > 1:
         gcode.comment = parts[1].replace("\n", "").replace(";", "").strip()
 
-    gcode_parts = (
-        parts[0].strip().split()
-    )  # Split the line at semicolon to remove comments
+    # Split the line at semicolon to remove comments
+    gcode_parts = parts[0].strip().split()
 
-    if (
-        validate_gcode_command_string(gcode_parts[0]) is False
-    ):  # validate command is one letter and one positive number
+    # validate command is one letter and one positive number
+    if validate_gcode_command_string(gcode_parts[0]) is False:
         gcode.command = parts[0]
         return gcode
 
     gcode.command = gcode_parts[0]
 
-    for part in gcode_parts[
-        1:
-    ]:  # Iterate through the remaining parts and extract key-value pairs
+    # Iterate through the remaining parts and extract key-value pairs
+    for part in gcode_parts[1:]:
         name = part[0]
         value = part[1:]
         try:
@@ -385,18 +376,25 @@ def read_gcode_file(path: str) -> List[Gcode]:
         for line in lines:
             gcode = parse_gcode_line(line, last_state)
 
-            if gcode.command == "G90":  # enable absolute coordinates
+            # enable absolute coordinates
+            if gcode.command == "G90":
                 gcode.move_is_absolute = True
-            elif gcode.command == "G91":  # enable relative coordinates
+
+            # enable relative coordinates
+            if gcode.command == "G91":
                 gcode.move_is_absolute = False
-            elif gcode.command == "M82":  # enable absolute distances for extrusion
+
+            # enable absolute distances for extrusion
+            if gcode.command == "M82":
                 gcode.extrude_is_absolute = True
-            elif gcode.command == "M83":  # enable relative distances for extrusion
+
+            # enable relative distances for extrusion
+            if gcode.command == "M83":
                 gcode.extrude_is_absolute = False
-            elif (
-                gcode.command == "M221" and force_full_flow is True
-            ):  # WACK: force full flow
-                # change gcode parameter S95 to S100
+
+            # WACK: force full flow
+            # change gcode parameter S95 to S100
+            if gcode.command == "M221" and force_full_flow is True:
                 gcode.set_param("S", 100)
                 print("Forcing full flow: M221 S95 changed to M221 S100")
 
@@ -417,7 +415,7 @@ def read_gcode_file(path: str) -> List[Gcode]:
                 gcode.command = "G1"
                 travel_move = True
 
-            if gcode.command == "G1" or gcode.command == "G2" or gcode.command == "G3":
+            if gcode.command in ("G1", "G2", "G3"):
                 x_value = gcode.get_param("X")
                 z_value = gcode.get_param("Z")
                 e_value = gcode.get_param("E")
@@ -459,8 +457,7 @@ def read_gcode_file(path: str) -> List[Gcode]:
                             or settling_current > max_settling_positive
                         ):
                             print(
-                                "Warning: settling_current out of bounds: "
-                                + str(settling_current)
+                                "Warning: settling_current out of bounds: {settling_current}"
                                 + "check the settling_positive and settling_negative values (both must be a positive number)"
                             )
 
@@ -486,25 +483,20 @@ def read_gcode_file(path: str) -> List[Gcode]:
 
                     if verbose:
                         gcodes.append(
-                            ";ABS E adj:"
-                            + "{:.5f}".format(e_xposition_adjust)
-                            + " settl:"
-                            + "{:.5f}".format(settling_current)
-                            + " Δx:"
-                            + "{:.3f}".format(x_change)
+                            f";ABS E adj:{e_xposition_adjust:.5f}"
+                            + f" settl:{settling_current:.5f}"
+                            + f" Δx:{x_change:.3f}"
                         )
-                        gcodes.append(
-                            ";REL E adj:" + "{:.5f}".format(e_adjust_relative)
-                        )
+                        gcodes.append(f";REL E adj:{e_adjust_relative:.5f}")
 
             gcodes.append(gcode)
             parse_progress += 1
 
             if (parse_progress % 100000) == 0:
-                parse_progress_percent = int(parse_progress/len(lines)*100)
+                parse_progress_percent = int(parse_progress / len(lines) * 100)
                 print(f"Processed {parse_progress} lines, {parse_progress_percent:d}%")
     readfile.close()
-    print("Completed " + str(parse_progress) + " lines, 100%")
+    print(f"Completed {parse_progress} lines, 100%")
     return gcodes
 
 
@@ -521,16 +513,16 @@ def main():
     gcodes_for_save = read_gcode_file(file_path)
 
     if os.getenv("SLIC3R_PP_OUTPUT_NAME") is not None:
-        destFilePath = os.getenv("SLIC3R_PP_OUTPUT_NAME")
+        dest_file_path = os.getenv("SLIC3R_PP_OUTPUT_NAME")
 
     else:
-        destFilePath = file_path
+        dest_file_path = file_path
 
-    destFilePath = re.sub(r"\.gcode$", "", destFilePath) + "_wack2.gcode"
+    dest_file_path = re.sub(r"\.gcode$", "", dest_file_path) + "_wack2.gcode"
 
-    print("Writing to " + destFilePath)
+    print("Writing to " + dest_file_path)
 
-    with open(destFilePath, "w", encoding="utf-8") as writefile:
+    with open(dest_file_path, "w", encoding="utf-8", newline='\r\n') as writefile:
         for gcode in gcodes_for_save:
             writefile.write(str(gcode) + "\n")
     writefile.close()
