@@ -104,14 +104,28 @@ it might not work as well for you.
 
 * Convert bgcode to gcode using the gcode viewer or disable binary gcode in
   PrusaSlicer
-* Install python
+* Install python 3.10 or newer
 * Open commandline (win+r and type "cmd")
 * Find python executable and shift+right click it and "copy as path"
 * Paste the path into commandline with right click
 * Do the same for the .py file location and the gcode file location in that
   order, separated by spaces, and then run it.
 
+Under linux it is similar:
+
+```shell
+python bowden_wack2_compensation.py face_0.4n_0.2mm_PETG_MINI_1d5h24m.gcode
+===== Wack2 compensation script =====
+Reading gcode file
+Gcode file loaded to memory
+...
+truncated output
+...
+Writing to face_0.4n_0.2mm_PETG_MINI_1d5h24m_wack2.gcode
+Done!
+```
+
 If you wish to test wack2 but don't want to deal with python and commandline,
 feel free to post your gcode as a comment and I'll process it.
 Alternatively, if you're in the Official Prusa discord,
-you can just ping me there (username murk).
+you can just ping me there (username `murk`) or `_KaszpiR_`.
