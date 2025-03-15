@@ -14,7 +14,7 @@ consistent all the way around, which was definitely not the case before.
 
 ![extrusions](extrusions.png)
 
-**What it does**
+## What it does
 
 Because the shape of the tube changes, the maximum "pushed" length of the tube
 changes as well. In order to compensate for that smoothly,
@@ -33,14 +33,14 @@ you can very nicely see what this means with larger parts in the line width view
 
 ![gcode preview](gcode_preview.png)
 
-**Caveats**
+## Caveats
 
-The intention of this script is to just equalise extrusion width because of
+The intention of this script is to just equalize extrusion width because of
 bowden tube travel, not so much to fully fix the original issue
 
 For accurate compensation, this script would require short extrusion lines.
 The above image with the gradient of extrusion widths shows a consistent
-extrusion when travelling basically the full width, which should not be the case.
+extrusion when traveling basically the full width, which should not be the case.
  For a proper resolution of this specific issue, the E axis should be bound to
  the X axis using the above formula in firmware.
 This script might not fully resolve the inconsistent extrusion after travel
@@ -51,11 +51,11 @@ You can even see that issue in the very first image of that comment.
 The script rudimentarily compensates G2 and G3 moves as well, but based only on
 the final position. The very first photo shows small curves looking the worst.
 
-The script by default deletes line width information and changes travel move 
+The script by default deletes line width information and changes travel move
 information in the gcode. Avoid using gcode viewer for things beyond script
 modifications.
 
-**Script**
+## Script
 
 The current script, as it stands, is fairly simple and could be implemented in
 firmware without too much math. For best theoretical accuracy, a recalculation
@@ -74,7 +74,7 @@ but you can reenable them if you feel adventurous:
 * Force full flow: Not tested at this time, would change flow to 100%
   instead of default 95% on the mini, so it doesn't have to be changed in
   the slicer.
-* Adjustment hardlimit factor: Essentially deprecated, was used before travel
+* Adjustment hard limit factor: Essentially deprecated, was used before travel
   moves had extrusions applied by default. That has caused some issues with
   very short extrusions having extreme flow values
 * Verbose: inserts information about absolute and relative extruder adjustment,
@@ -84,11 +84,14 @@ Download script here: [download repo master branch as zip](https://github.com/nv
 
 Contains:
 
-* bowden_wack2_compensation.py
-* test1nocrossing.gcode - gcode from @Prusa-Support to test the issue [[BUG] Delayed extrusion after travel when using 0.6 mm nozzle (and 0.4 mm as well) #2997 (comment](https://github.com/prusa3d/Prusa-Firmware-Buddy/issues/2997#issuecomment-1454763541)
-*test1nocrossing_wack2.gcode (above gcode adjusted with wack2)
+* `bowden_wack2_compensation.py`
+* `test1nocrossing.gcode` - gcode from @Prusa-Support to test the issue
+  [#2997 [BUG] Delayed extrusion after travel when using 0.6 mm nozzle...](https://github.com/prusa3d/Prusa-Firmware-Buddy/issues/2997#issuecomment-1454763541)
+* `test1nocrossing_wack2.gcode` - (above gcode adjusted with wack2)
 
-**IMPORTANT!** Despite this improving the quality of my standard PETG prints on
+## Important
+
+Despite this improving the quality of my standard PETG prints on
 my minis 2 and 3, this seems to cause overextrusion with this test gcode with
 PLA on printer 1. yedvilun's script improves the test gcode for me,
 but doesn't resolve the inconsistent extrusion width.
@@ -99,13 +102,13 @@ it might not work as well for you.
 **Usage:**
 
 * Convert bgcode to gcode using the gcode viewer or disable binary gcode in
-  prusaslicer
+  PrusaSlicer
 * Install python
 * Open commandline (win+r and type "cmd")
-* Find phyton executable and shift+right click it and "copy as path"
+* Find python executable and shift+right click it and "copy as path"
 * Paste the path into commandline with right click
 * Do the same for the .py file location and the gcode file location in that
-  order, seperated by spaces, and then run it.
+  order, separated by spaces, and then run it.
 
 If you wish to test wack2 but don't want to deal with python and commandline,
 feel free to post your gcode as a comment and I'll process it.
