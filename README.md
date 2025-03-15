@@ -35,23 +35,24 @@ you can very nicely see what this means with larger parts in the line width view
 
 ## Caveats
 
-The intention of this script is to just equalize extrusion width because of
+* The intention of this script is to just equalize extrusion width because of
 bowden tube travel, not so much to fully fix the original issue
 
-For accurate compensation, this script would require short extrusion lines.
+* For accurate compensation, this script would require short extrusion lines.
 The above image with the gradient of extrusion widths shows a consistent
 extrusion when traveling basically the full width, which should not be the case.
- For a proper resolution of this specific issue, the E axis should be bound to
- the X axis using the above formula in firmware.
-This script might not fully resolve the inconsistent extrusion after travel
+For a proper resolution of this specific issue, the E axis should be bound to
+the X axis using the above formula in firmware.
+
+* This script might not fully resolve the inconsistent extrusion after travel
 issues. I'm still planning to replace the hotend PTFE tube on my printers with
 the official one, which may be the actual culprit.
 You can even see that issue in the very first image of that comment.
 
-The script rudimentarily compensates G2 and G3 moves as well, but based only on
+* The script rudimentarily compensates G2 and G3 moves as well, but based only on
 the final position. The very first photo shows small curves looking the worst.
 
-The script by default deletes line width information and changes travel move
+* The script by default deletes line width information and changes travel move
 information in the gcode. Avoid using gcode viewer for things beyond script
 modifications.
 
