@@ -51,9 +51,12 @@ You can even see that issue in the very first image of that comment.
 The script rudimentarily compensates G2 and G3 moves as well, but based only on
 the final position. The very first photo shows small curves looking the worst.
 
-The script by default deletes line width information and changes travel move information in the gcode. Avoid using gcode viewer for things beyond script modifications
+The script by default deletes line width information and changes travel move 
+information in the gcode. Avoid using gcode viewer for things beyond script
+modifications.
 
 **Script**
+
 The current script, as it stands, is fairly simple and could be implemented in
 firmware without too much math. For best theoretical accuracy, a recalculation
 should be done as the move happens, but if there's no compute power for
@@ -62,6 +65,20 @@ and made to use a lookup table in some way.
 
 Several things in the script were disabled as a result of my own testing,
 but you can reenable them if you feel adventurous:
+
+* Settling: used to slowly add or remove extrusion length when changing
+  direction (I tested with 0.2 mm range). I ended up having slightly better
+  results without it, so I set it to 0.
+* Freeze settling on travel moves: Same as above, didn't seem to have decent
+  effect
+* Force full flow: Not tested at this time, would change flow to 100%
+  instead of default 95% on the mini, so it doesn't have to be changed in
+  the slicer.
+* Adjustment hardlimit factor: Essentially deprecated, was used before travel
+  moves had extrusions applied by default. That has caused some issues with
+  very short extrusions having extreme flow values
+* Verbose: inserts information about absolute and relative extruder adjustment,
+  settling value, and change in x
 
 Download script here: [download repo master branch as zip](https://github.com/nvtkaszpir/bowden-wack2-compensation/archive/refs/heads/master.zip)
 
@@ -90,5 +107,7 @@ it might not work as well for you.
 * Do the same for the .py file location and the gcode file location in that
   order, seperated by spaces, and then run it.
 
-If you wish to test wack2 but don't want to deal with python and commandline, feel free to post your gcode as a comment and I'll process it. Alternatively, if you're in the Official Prusa discord, you can just ping me there (username murk).
-
+If you wish to test wack2 but don't want to deal with python and commandline,
+feel free to post your gcode as a comment and I'll process it.
+Alternatively, if you're in the Official Prusa discord,
+you can just ping me there (username murk).
