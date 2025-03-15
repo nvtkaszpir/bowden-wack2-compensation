@@ -180,7 +180,7 @@ class Gcode:
                 if st.value is None:
                     string += f" {st.name}"
                 else:
-                    if st.name == "X" or st.name == "Y" or st.name == "Z":
+                    if st.name in ('X', 'Y', 'Z'):
                         string += f" {st.name}{Gcode._format_number(st.value, 3)}"
                     elif st.name == "E":
                         string += f" {st.name}{Gcode._format_number(st.value, 5)}"
@@ -504,7 +504,7 @@ def read_gcode_file(path: str) -> List[Gcode]:
                 parse_progress_percent = int(parse_progress/len(lines)*100)
                 print(f"Processed {parse_progress} lines, {parse_progress_percent:d}%")
     readfile.close()
-    print("Completed " + str(parse_progress) + " lines")
+    print("Completed " + str(parse_progress) + " lines, 100%")
     return gcodes
 
 
