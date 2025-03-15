@@ -501,7 +501,8 @@ def read_gcode_file(path: str) -> List[Gcode]:
             parse_progress += 1
 
             if (parse_progress % 100000) == 0:
-                print("Processed " + str(parse_progress) + " lines")
+                parse_progress_percent = int(parse_progress/len(lines)*100)
+                print(f"Processed {parse_progress} lines, {parse_progress_percent:d}%")
     readfile.close()
     print("Completed " + str(parse_progress) + " lines")
     return gcodes
