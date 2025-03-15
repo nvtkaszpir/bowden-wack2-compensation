@@ -363,8 +363,8 @@ def parse_gcode_line(gcode_line: str, prev_state: State) -> Gcode:
 def read_gcode_file(path: str) -> List[Gcode]:
     gcodes = []
     z_height = 0.0
-    layer_height = os.getenv("SLIC3R_layer_height")
-    last_layer_height = os.getenv("SLIC3R_layer_height")
+    layer_height = os.getenv("SLIC3R_LAYER_HEIGHT")
+    last_layer_height = os.getenv("SLIC3R_LAYER_HEIGHT")
 
     print("===== Wack2 compensation script =====")
 
